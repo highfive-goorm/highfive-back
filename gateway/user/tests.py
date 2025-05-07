@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from user.user_service import create_user
+from gateway.user.user_service import create_user
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.hashers import check_password
 

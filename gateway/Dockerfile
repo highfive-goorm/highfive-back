@@ -19,7 +19,7 @@ RUN pip install --no-cache-dir --upgrade pip \
 RUN pip install --no-cache-dir --upgrade pip setuptools
 RUN pip install --no-cache-dir --upgrade pip mysqlclient==2.2.0
 # 프로젝트 소스 복사
-COPY . .
+COPY .. .
 
 # 포트 설정
 EXPOSE 8000
