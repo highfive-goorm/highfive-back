@@ -3,8 +3,21 @@ version: '3.8'
 services:
   web:
     build: ./gateway
-    env_file: .env
+    env_file: gateway/.env
 
     ports:
       - "8000:8000"
 
+  product:
+    build:
+      context: ./product
+    container_name: product
+    ports:
+      - "8001:8001"
+    networks:
+      - msa-network
+
+
+networks:
+  msa-network:
+    driver: bridge
