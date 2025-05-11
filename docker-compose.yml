@@ -16,7 +16,15 @@ services:
       - "8001:8001"
     networks:
       - msa-network
-
+      -
+  cart:
+    build:
+      context: ./cart
+    container_name: cart
+    ports:
+      - "8002:8002"
+    networks:
+      - msa-network
 
 networks:
   msa-network:
