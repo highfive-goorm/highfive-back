@@ -1,3 +1,4 @@
+# alert/app/schemas.py
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
@@ -5,7 +6,7 @@ from datetime import datetime
 class AlertBase(BaseModel):
     title: str
     content: str
-    user_id: int
+    user_id: str
     is_global: Optional[bool] = False
 
 class AlertCreate(AlertBase):
@@ -19,6 +20,7 @@ class AlertUpdate(BaseModel):
 class AlertInDB(AlertBase):
     id: int
     created_at: datetime
+    updated_at: datetime
 
     class Config:
         orm_mode = True

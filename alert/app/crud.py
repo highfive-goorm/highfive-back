@@ -1,40 +1,28 @@
-from typing import Optional
-
+# alert/app/crud.py
+from typing import Optional, List
 from sqlalchemy.orm import Session
-
-from .database import SessionLocal
 from .models import Alert
 from .schemas import AlertCreate, AlertUpdate
 from datetime import datetime
 
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-class CRUD(Alert):
-    db = get_db()
-
-    def create_alert(db: Session, alert: AlertCreate):
+class CRUDAlert:
+    def create_alert(self, db: Session, alert: AlertCreate) -> Alert:
         db_alert = Alert(**alert.dict(), created_at=datetime.utcnow())
         db.add(db_alert)
         db.commit()
         db.refresh(db_alert)
         return db_alert
 
-    def get_alert(db: Session, id: int):
+    def get_alert(self, db: Session, id: int) -> Optional[Alert]:
         return db.query(Alert).filter(Alert.id == id).first()
 
-    def get_alerts(db: Session, user_id: Optional[int] = None):
-        if user_id:
-            return db.query(Alert).filter((Alert.user_id == user_id) | (Alert.is_global == True)).all()
-        return db.query(Alert).all()
+    def get_alerts(self, db: Session, user_id: Optional[str] = None) -> List[Alert]:
+    if user_id:
+        return db.query(Alert).filter((Alert.user_id == user_id) | (Alert.is_global == True)).all()
+    # user_id가 없으면 is_global이 True인 것만 반환
+    return db.query(Alert).filter(Alert.is_global == True).all()
 
-    def update_alert(db: Session, id: int, update_data: AlertUpdate):
+    def update_alert(self, db: Session, id: int, update_data: AlertUpdate) -> Optional[Alert]:
         alert = db.query(Alert).filter(Alert.id == id).first()
         if alert:
             for key, value in update_data.dict(exclude_unset=True).items():
@@ -43,7 +31,7 @@ class CRUD(Alert):
             db.refresh(alert)
         return alert
 
-    def delete_alert(db: Session, id: int):
+    def delete_alert(self, db: Session, id: int) -> bool:
         alert = db.query(Alert).filter(Alert.id == id).first()
         if alert:
             db.delete(alert)

@@ -1,0 +1,124 @@
+폴더 PATH의 목록입니다.
+볼륨 일련 번호는 E4A7-39F2입니다.
+C:.
+│  .env
+│  .gitignore
+│  .gitmessages.txt
+│  0514_13_09.yaml
+│  docker-compose.yml
+│  LICENSE
+│  structure.txt
+│  
+├─.github
+│  ├─ISSUE_TEMPLATE
+│  │      issue_form.yml
+│  │      
+│  └─workflows
+│          close-jira-issue.yml
+│          create-jira-issue.yml
+│          
+├─.idea
+│  │  highfive-back.iml
+│  │  misc.xml
+│  │  vcs.xml
+│  │  workspace.xml
+│  │  
+│  └─inspectionProfiles
+│          profiles_settings.xml
+│          Project_Default.xml
+│          
+├─admin
+│  │  Dockerfile
+│  │  requirements.txt
+│  │  
+│  └─app
+│          database.py
+│          main.py
+│          models.py
+│          schemas.py
+│          
+├─alert
+│  │  Dockerfile
+│  │  requirements.txt
+│  │  
+│  └─app
+│          crud.py
+│          database.py
+│          main.py
+│          models.py
+│          schemas.py
+│          
+├─cart
+│  │  Dockerfile
+│  │  requirements.txt
+│  │  
+│  └─app
+│          database.py
+│          main.py
+│          schemas.py
+│          
+├─data
+│      array.json
+│      brand.json
+│      cart.json
+│      order.json
+│      product-array.json
+│      product.json
+│      promotion.json
+│      user.json
+│      
+├─gateway
+│  │  Dockerfile
+│  │  manage.py
+│  │  requirements.txt
+│  │  test_user.py
+│  │  
+│  ├─highfive_back
+│  │      asgi.py
+│  │      settings.py
+│  │      urls.py
+│  │      views.py
+│  │      wsgi.py
+│  │      
+│  └─user
+│          admin.py
+│          apps.py
+│          models.py
+│          serializers.py
+│          tests.py
+│          urls.py
+│          user_service.py
+│          views.py
+│          
+├─order
+│  │  Dockerfile
+│  │  requirements.txt
+│  │  
+│  └─app
+│          crud.py
+│          database.py
+│          main.py
+│          schemas.py
+│          
+├─product
+│  │  Dockerfile
+│  │  requirements.txt
+│  │  
+│  └─app
+│          database.py
+│          main.py
+│          schemas.py
+│          
+├─promotion
+│  │  Dockerfile
+│  │  requirements.txt
+│  │  
+│  └─app
+│          crud.py
+│          database.py
+│          main.py
+│          schemas.py
+│          
+└─scripts
+        init-import.sh
+        

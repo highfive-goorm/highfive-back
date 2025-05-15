@@ -1,13 +1,15 @@
-from typing import Optional, List
-
-from fastapi import APIRouter, HTTPException, Query, FastAPI, Depends
-from datetime import datetime
-from bson import ObjectId
+# alert/app/main.py
+from fastapi import FastAPI, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-from .crud import CRUD as crud
-from .database import SessionLocal
-from .schemas import AlertCreate, AlertInDB, AlertUpdate
+from .database import SessionLocal, Base, engine
+from .crud import CRUDAlert
+from .schemas import AlertCreate, AlertUpdate, AlertInDB
+from typing import List, Optional
 
+app = FastAPI()
+Base.metadata.create_all(bind=engine)  # 테이블 자동 생성
+
+crud = CRUDAlert()
 
 def get_db():
     db = SessionLocal()
@@ -16,38 +18,16 @@ def get_db():
     finally:
         db.close()
 
-
-app = FastAPI()
-
-
-@app.post("/alert", response_model=AlertInDB, status_code=201)
-def create_alert(alert: AlertCreate, db: Session = Depends(get_db)):
-    return crud.create_alert(db, alert)
-
-
-@app.get("/alert", response_model=List[AlertInDB])
-def list_alerts(user_id: Optional[int] = None, db: Session = Depends(get_db)):
-    return crud.get_alerts(db, user_id)
-
-
-@app.get("/alert/{id}", response_model=AlertInDB)
-def get_alert(id: int, db: Session = Depends(get_db)):
-    alert = crud.get_alert(db, id)
-    if not alert:
-        raise HTTPException(status_code=404, detail="Alert not found")
-    return alert
-
-
-@app.put("/alert/{id}", response_model=AlertInDB)
-def update_alert(id: int, update: AlertUpdate, db: Session = Depends(get_db)):
-    alert = crud.update_alert(db, id, update)
-    if not alert:
-        raise HTTPException(status_code=404, detail="Alert not found")
-    return alert
-
-
-@app.delete("/alert/{id}", status_code=204)
-def delete_alert(id: int, db: Session = Depends(get_db)):
-    if not crud.delete_alert(db, id):
-        raise HTTPException(status_code=404, detail="Alert not found")
-    return
+@app.get("/alert", response_model=dict)
+def list_alerts(
+    user_id: Optional[str] = None,
+    page: int = 1,
+    size: int = 10,
+    db: Session = Depends(get_db)
+):
+    all_alerts = crud.get_alerts(db, user_id)
+    total = len(all_alerts)
+    start = (page - 1) * size
+    end = start + size
+    paginated_alerts = all_alerts[start:end]
+    return {"alerts": paginated_alerts, "total": total}
