@@ -1,12 +1,17 @@
-version: '3.8'
+
 
 services:
-  web:
+  gateway:
     build: ./gateway
     env_file: gateway/.env
-
+    container_name: gateway
     ports:
       - "8000:8000"
+    depends_on:
+      - product
+
+    networks:
+      - backend
   admin:
     build:
       context: ./admin
@@ -14,7 +19,15 @@ services:
     ports:
       - "8003:8003"
     networks:
-      - msa-network
+      - backend
+  alert:
+    build:
+      context: ./alert
+    container_name: alert
+    ports:
+      - "8005:8005"
+    networks:
+      - backend
   mysql:
     image: mysql:8.0
     container_name: mysql_db
@@ -25,11 +38,11 @@ services:
       MYSQL_USER: admin
       MYSQL_PASSWORD: admin123
     ports:
-      - "3306:3306"
+      - "3307:3307"
     volumes:
-      - mysql_data:/var/lib/mysql
-
-
+      - mysql:/var/lib/mysql
+    networks:
+      - backend
 
   order:
     build:
@@ -38,8 +51,7 @@ services:
     ports:
       - "8004:8004"
     networks:
-      - msa-network
-
+      - backend
   product:
     build:
       context: ./product
@@ -47,7 +59,8 @@ services:
     ports:
       - "8001:8001"
     networks:
-      - msa-network
+      - backend
+
   mongodb_product:
     image: mongo:6.0
     container_name: mongodb_product
@@ -55,10 +68,43 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: mongodb_product
+      MONGO_INITDB_DATABASE: product
     ports:
-      - "27018:27018"
+      - "27018:27017"  # 내부는 항상 27017
+
     volumes:
-      - mongo_data:/data/db
+      - mongodb_product:/data/db
+    networks:
+      - backend
+  mongodb_brand:
+    image: mongo:6.0
+    container_name: mongodb_brand
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: mongodb_brand
+      MONGO_INITDB_DATABASE: brand
+    ports:
+      - "27020:27017"  # 내부는 항상 27017
+
+    volumes:
+      - mongodb_brand:/data/db
+    networks:
+      - backend
+  mongodb_order:
+    image: mongo:6.0
+    container_name: mongodb_order
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: mongodb_order
+      MONGO_INITDB_DATABASE: order
+    ports:
+      - "27019:27017"  # 내부는 항상 27017
+    volumes:
+      - mongodb_order:/data/db
+    networks:
+      - backend
   cart:
     build:
       context: ./cart
@@ -66,7 +112,7 @@ services:
     ports:
       - "8002:8002"
     networks:
-      - msa-network
+      - backend
   mongodb_cart:
     image: mongo:6.0
     container_name: mongodb_cart
@@ -74,10 +120,20 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: mongodb_cart
+      MONGO_INITDB_DATABASE: cart
     ports:
       - "27017:27017"
     volumes:
-      - mongo_data:/data/db
+      - mongodb_cart:/data/db
+    networks:
+      - backend
+volumes:
+  mysql:
+  mongodb_cart:
+  mongodb_product:
+  mongodb_order:
+  mongodb_brand:
 networks:
-  msa-network:
+  backend:
     driver: bridge
+

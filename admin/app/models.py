@@ -4,6 +4,7 @@ from datetime import datetime
 
 Base = declarative_base()
 
+
 class Admin(Base):
     __tablename__ = "admin"
 

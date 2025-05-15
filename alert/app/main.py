@@ -1,27 +1,12 @@
-from fastapi import APIRouter, HTTPException, FastAPI, Depends
-import hashlib
-from datetime import datetime, timedelta
-from jose import jwt
-from requests import Session, Response
+from typing import Optional, List
 
-from admin.app.database import SessionLocal
-from admin.app.models import Admin
-from admin.app.schemas import TokenResponse, AdminLogin
-
-app = FastAPI()
-router = APIRouter()
-
-SECRET_KEY = 'django-insecure-=#ztpi!p#7h6ud@omrn$yjd%jxp(__+1*+0wew+55g!(^%wsfd'
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
-
-
-def hash_password(password: str) -> str:
-    return hashlib.sha256(password.encode()).hexdigest()
-
-
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return hash_password(plain_password) == hashed_password
+from fastapi import APIRouter, HTTPException, Query, FastAPI, Depends
+from datetime import datetime
+from bson import ObjectId
+from sqlalchemy.orm import Session
+from .crud import CRUD as crud
+from .database import SessionLocal
+from .schemas import AlertCreate, AlertInDB, AlertUpdate
 
 
 def get_db():
@@ -32,9 +17,37 @@ def get_db():
         db.close()
 
 
-@router.post("/admin", response_model=TokenResponse)
-def admin_login(login_data: AdminLogin, db: Session = Depends(get_db)):
-    admin = db.query(Admin).filter(Admin.account == login_data.account).first()
-    if not admin or not verify_password(login_data.password, admin.password):
-        raise HTTPException(status_code=401, detail="Invalid credentials")
-    return {"message": "관리자 로그인"}
+app = FastAPI()
+
+
+@app.post("/alert", response_model=AlertInDB, status_code=201)
+def create_alert(alert: AlertCreate, db: Session = Depends(get_db)):
+    return crud.create_alert(db, alert)
+
+
+@app.get("/alert", response_model=List[AlertInDB])
+def list_alerts(user_id: Optional[int] = None, db: Session = Depends(get_db)):
+    return crud.get_alerts(db, user_id)
+
+
+@app.get("/alert/{id}", response_model=AlertInDB)
+def get_alert(id: int, db: Session = Depends(get_db)):
+    alert = crud.get_alert(db, id)
+    if not alert:
+        raise HTTPException(status_code=404, detail="Alert not found")
+    return alert
+
+
+@app.put("/alert/{id}", response_model=AlertInDB)
+def update_alert(id: int, update: AlertUpdate, db: Session = Depends(get_db)):
+    alert = crud.update_alert(db, id, update)
+    if not alert:
+        raise HTTPException(status_code=404, detail="Alert not found")
+    return alert
+
+
+@app.delete("/alert/{id}", status_code=204)
+def delete_alert(id: int, db: Session = Depends(get_db)):
+    if not crud.delete_alert(db, id):
+        raise HTTPException(status_code=404, detail="Alert not found")
+    return

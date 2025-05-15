@@ -1,12 +1,13 @@
-from sqlalchemy import Column, Integer, String, DateTime
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, Integer, String, Boolean, DateTime
 from datetime import datetime
+from .database import Base
 
-Base = declarative_base()
-
-class Admin(Base):
-    __tablename__ = "admin"
+class Alert(Base):
+    __tablename__ = "alert"
 
     id = Column(Integer, primary_key=True, index=True)
-    account = Column(String(50), nullable=False)
-    password = Column(String(200), nullable=False)  # SHA256 해시 저장
+    title = Column(String(255), nullable=False)
+    content = Column(String(1000), nullable=False)
+    user_id = Column(Integer, nullable=False)
+    is_global = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)

@@ -1,15 +1,13 @@
-from fastapi import APIRouter, HTTPException, FastAPI, Depends
+from fastapi import HTTPException, FastAPI, Depends
 import hashlib
-from datetime import datetime, timedelta
-from jose import jwt
-from requests import Session, Response
 
-from admin.app.database import SessionLocal
-from admin.app.models import Admin
-from admin.app.schemas import TokenResponse, AdminLogin
+from requests import Session
+
+from database import SessionLocal
+from models import Admin
+from schemas import AdminLogin
 
 app = FastAPI()
-router = APIRouter()
 
 SECRET_KEY = 'django-insecure-=#ztpi!p#7h6ud@omrn$yjd%jxp(__+1*+0wew+55g!(^%wsfd'
 ALGORITHM = "HS256"
@@ -32,7 +30,7 @@ def get_db():
         db.close()
 
 
-@router.post("/admin", response_model=TokenResponse)
+@app.post("/admin")
 def admin_login(login_data: AdminLogin, db: Session = Depends(get_db)):
     admin = db.query(Admin).filter(Admin.account == login_data.account).first()
     if not admin or not verify_password(login_data.password, admin.password):

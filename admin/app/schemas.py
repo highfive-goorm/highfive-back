@@ -1,9 +1,7 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
+
 
 class AdminLogin(BaseModel):
-    id:int
-    account:str
+    id: int
+    account: str
     password: str
-
-class TokenResponse(BaseModel):
-    access_token: str
