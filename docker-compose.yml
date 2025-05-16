@@ -99,7 +99,6 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: mongodb_order
-      MONGO_INITDB_DATABASE: order
     ports:
       - "27019:27017"
     volumes:

@@ -1,7 +1,7 @@
 # alert/app/models.py
 from sqlalchemy import Column, Integer, String, Boolean, DateTime
 from datetime import datetime
-from database import Base
+from .database import Base
 
 class Alert(Base):
     __tablename__ = "alert"

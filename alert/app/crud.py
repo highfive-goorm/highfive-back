@@ -17,10 +17,10 @@ class CRUDAlert:
         return db.query(Alert).filter(Alert.id == id).first()
 
     def get_alerts(self, db: Session, user_id: Optional[str] = None) -> List[Alert]:
-    if user_id:
-        return db.query(Alert).filter((Alert.user_id == user_id) | (Alert.is_global == True)).all()
-    # user_id가 없으면 is_global이 True인 것만 반환
-    return db.query(Alert).filter(Alert.is_global == True).all()
+        if user_id:
+            return db.query(Alert).filter((Alert.user_id == user_id) | (Alert.is_global == True)).all()
+        # user_id가 없으면 is_global이 True인 것만 반환
+        return db.query(Alert).filter(Alert.is_global == True).all()
 
     def update_alert(self, db: Session, id: int, update_data: AlertUpdate) -> Optional[Alert]:
         alert = db.query(Alert).filter(Alert.id == id).first()

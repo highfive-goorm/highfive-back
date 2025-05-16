@@ -6,7 +6,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DATABASE_URL = os.getenv("DATABASE_URL", "mysql+pymysql://admin:admin123@mysql_db:3306/admin")
+# alert/app/database.py
+DATABASE_URL = os.getenv("DATABASE_URL", "mysql+pymysql://admin:admin123@alert-db:3306/alert")
 Base = declarative_base()
 
 engine = create_engine(DATABASE_URL)

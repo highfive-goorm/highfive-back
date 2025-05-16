@@ -1,5 +1,5 @@
 # alert/app/schemas.py
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional
 from datetime import datetime
 
@@ -22,5 +22,7 @@ class AlertInDB(AlertBase):
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(
+        validate_by_name=True,
+        from_attributes=True
+    )
