@@ -1,11 +1,12 @@
 # admin/app/main.py
 from fastapi import HTTPException, FastAPI, Depends
 from sqlalchemy.orm import Session
-from database import SessionLocal
-from models import Admin
-from schemas import AdminLogin
+from .database import SessionLocal
+from .models import Admin
+from .schemas import AdminLogin
 
 app = FastAPI()
+
 
 def get_db():
     db = SessionLocal()
@@ -13,6 +14,7 @@ def get_db():
         yield db
     finally:
         db.close()
+
 
 @app.post("/admin/login")
 def admin_login(login_data: AdminLogin, db: Session = Depends(get_db)):

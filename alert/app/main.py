@@ -1,15 +1,15 @@
 # alert/app/main.py
 from fastapi import FastAPI, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-from .database import SessionLocal, Base, engine
+from .database import SessionLocal
 from .crud import CRUDAlert
-from .schemas import AlertCreate, AlertUpdate, AlertInDB
 from typing import List, Optional
 
 app = FastAPI()
-Base.metadata.create_all(bind=engine)  # 테이블 자동 생성
+# 테이블 자동 생성
 
 crud = CRUDAlert()
+
 
 def get_db():
     db = SessionLocal()
@@ -18,12 +18,13 @@ def get_db():
     finally:
         db.close()
 
+
 @app.get("/alert", response_model=dict)
 def list_alerts(
-    user_id: Optional[str] = None,
-    page: int = 1,
-    size: int = 10,
-    db: Session = Depends(get_db)
+        user_id: Optional[str] = None,
+        page: int = 1,
+        size: int = 10,
+        db: Session = Depends(get_db)
 ):
     all_alerts = crud.get_alerts(db, user_id)
     total = len(all_alerts)

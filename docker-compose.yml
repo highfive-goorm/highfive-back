@@ -1,10 +1,11 @@
 services:
   gateway:
     build: ./gateway
-    env_file: gateway/.env
+    env_file: .env
     container_name: gateway
     ports:
       - "8000:8000"
+
     depends_on:
       - product
     networks:
@@ -26,21 +27,6 @@ services:
     networks:
       - backend
 
-  mysql:
-    image: mysql:8.0
-    container_name: mysql_db
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: admin
-      MYSQL_USER: admin
-      MYSQL_PASSWORD: admin123
-    ports:
-      - "3307:3306"
-    volumes:
-      - mysql:/var/lib/mysql
-    networks:
-      - backend
 
   order:
     build: ./order
@@ -63,8 +49,8 @@ services:
     container_name: mongodb_product
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: mongodb_product
+      MONGO_INITDB_ROOT_USERNAME: ${DB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD}
       MONGO_INITDB_DATABASE: product
     ports:
       - "27018:27017"
@@ -80,8 +66,8 @@ services:
     container_name: mongodb_brand
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: mongodb_brand
+      MONGO_INITDB_ROOT_USERNAME: ${DB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_USER}
       MONGO_INITDB_DATABASE: brand
     ports:
       - "27020:27017"
@@ -97,8 +83,8 @@ services:
     container_name: mongodb_order
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: mongodb_order
+      MONGO_INITDB_ROOT_USERNAME: ${DB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD}
     ports:
       - "27019:27017"
     volumes:
@@ -121,8 +107,8 @@ services:
     container_name: mongodb_cart
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: mongodb_cart
+      MONGO_INITDB_ROOT_USERNAME: ${DB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD}
       MONGO_INITDB_DATABASE: cart
     ports:
       - "27017:27017"
@@ -139,8 +125,8 @@ services:
     container_name: mongodb_promotion
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: mongodb_promotion
+      MONGO_INITDB_ROOT_USERNAME: ${DB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD}
       MONGO_INITDB_DATABASE: promotion
     ports:
       - "27021:27017"
@@ -168,7 +154,8 @@ volumes:
   mongodb_order:
   mongodb_brand:
   mongodb_promotion:
-
+  mysql_alert:
+  mysql_user_data:
 networks:
   backend:
     driver: bridge
