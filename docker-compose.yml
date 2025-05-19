@@ -99,6 +99,8 @@ services:
     container_name: cart
     ports:
       - "8002:8002"
+    depends_on:
+      - mongodb_cart
     networks:
       - backend
 
@@ -107,8 +109,9 @@ services:
     container_name: mongodb_cart
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${DB_USER}
-      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD}
+      # interpolation 으로 .env 파일의 값을 그대로 주입
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: mongodb_cart
       MONGO_INITDB_DATABASE: cart
     ports:
       - "27017:27017"
