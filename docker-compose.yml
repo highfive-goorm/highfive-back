@@ -49,8 +49,8 @@ services:
     container_name: mongodb_product
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${DB_USER}
-      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD}
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: mongodb_product
       MONGO_INITDB_DATABASE: product
     ports:
       - "27018:27017"
@@ -66,8 +66,8 @@ services:
     container_name: mongodb_brand
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${DB_USER}
-      MONGO_INITDB_ROOT_PASSWORD: ${DB_USER}
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: mongodb_brand
       MONGO_INITDB_DATABASE: brand
     ports:
       - "27020:27017"
