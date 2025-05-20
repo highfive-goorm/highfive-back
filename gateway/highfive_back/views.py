@@ -4,13 +4,18 @@ from django.http import JsonResponse, HttpResponse
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
+
+
 @method_decorator(csrf_exempt, name="dispatch")
 class AdminView(View):
     pass
+
+
 # CSRF exempt for internal microservice proxy
 @method_decorator(csrf_exempt, name="dispatch")
 class ProductProxyView(View):
     BASE_URL = "http://product:8001/product"
+
     def get(self, request, id=None):
         # 1) URL 결정: 단일 조회 vs. 전체 리스트
         if id is not None:
@@ -70,6 +75,8 @@ class ProductProxyView(View):
                 status=resp.status_code,
                 content_type=resp.headers.get("Content-Type", "application/octet-stream")
             )
+
+
 @method_decorator(csrf_exempt, name="dispatch")
 class OrderProxyView(View):
     BASE_URL = "http://order:8004/order"
@@ -114,21 +121,27 @@ class OrderProxyView(View):
             return HttpResponse(status=204)
         return JsonResponse(resp.json(), safe=False, status=resp.status_code)
 
+
 @method_decorator(csrf_exempt, name="dispatch")
 class CartProxyView(View):
     BASE_URL = "http://cart:8002/cart"
 
-    def post(self, request, user_id=None, product_id=None):
-        if not user_id:
-            return JsonResponse({"error": "user_id required"}, status=400)
-        path = f"/{user_id}"
-        url = f"{self.BASE_URL}{path}"
+    def post(self, request, user_id):
+        # 1) load the raw JSON from the incoming Django request
         try:
-            payload = json.loads(request.body)
+            payload = json.loads(request.body.decode('utf-8'))
         except json.JSONDecodeError:
-            return JsonResponse({"error": "Invalid JSON"}, status=400)
-        resp = requests.post(url, json=payload)
-        return JsonResponse(resp.json(), safe=False, status=resp.status_code)
+            return JsonResponse({"detail": "Invalid JSON"}, status=400)
+
+        # 2) forward as JSON to your cart service
+        resp = requests.post(
+            f"http://cart:8002/cart/{user_id}",
+            json=payload,
+            headers={"Content-Type": "application/json"},
+            timeout=5
+        )
+
+        return JsonResponse(resp.json(), status=resp.status_code)
 
     def get(self, request, user_id=None, product_id=None):
         if not user_id:
@@ -162,6 +175,8 @@ class CartProxyView(View):
         if resp.status_code == 204:
             return HttpResponse(status=204)
         return JsonResponse(resp.json(), safe=False, status=resp.status_code)
+
+
 class AlertProxyView(View):
     pass
 # urls.py 매핑 예시
