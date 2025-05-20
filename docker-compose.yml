@@ -38,6 +38,11 @@ services:
 
   product:
     build: ./product
+    depends_on:
+      mongodb_product:
+        condition: service_healthy
+      mongodb_brand:
+        condition: service_healthy
     container_name: product
     ports:
       - "8001:8001"
@@ -58,6 +63,11 @@ services:
       - mongodb_product:/data/db
       - ./mongo-init/product:/docker-entrypoint-initdb.d
       - ./data:/data
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 2s
+      retries: 5
     networks:
       - backend
 
@@ -75,6 +85,11 @@ services:
       - mongodb_brand:/data/db
       - ./mongo-init/brand:/docker-entrypoint-initdb.d
       - ./data:/data
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 2s
+      retries: 5
     networks:
       - backend
 
