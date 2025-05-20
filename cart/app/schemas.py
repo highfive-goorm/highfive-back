@@ -1,15 +1,22 @@
 import uuid
 
 from pydantic import BaseModel, Field, ConfigDict
-from typing import List
+from typing import List, Optional
 from datetime import datetime
 
 
 class CartItem(BaseModel):
     product_id: int
     quantity: int
-    #discounted_price: int = 0
-    #discount: int = 0
+    discounted_price: int = 0
+    discount: int = 0
+    img_url: str
+    name: str
+    price: int
+
+
+class CartReq(BaseModel):
+    quantity: int
 
 
 class CartBase(BaseModel):
