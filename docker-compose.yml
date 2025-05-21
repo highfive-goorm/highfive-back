@@ -5,11 +5,12 @@ services:
     container_name: gateway
     ports:
       - "8000:8000"
-
     depends_on:
       - product
     networks:
       - backend
+    volumes:
+      - ./host-logs/gateway:/app/logs
 
   admin:
     build: ./admin
@@ -48,6 +49,8 @@ services:
       - "8001:8001"
     networks:
       - backend
+    volumes:
+      - ./host-logs/product:/app/logs
 
   mongodb_product:
     image: mongo:6.0
