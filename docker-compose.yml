@@ -169,6 +169,20 @@ services:
     depends_on:
       - mongodb_promotion
 
+  recommend:
+    build: ./recommend
+    container_name: recommend
+    restart: always
+    ports:
+      - "8007:8007"
+    networks:
+      - backend
+    depends_on:
+      - product
+    volumes:
+      - ./data/product.json:/data/product.json
+      - ./data/brand.json:/data/brand.json
+
 volumes:
   mysql:
   mongodb_product:
