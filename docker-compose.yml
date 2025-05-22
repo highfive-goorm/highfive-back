@@ -100,8 +100,8 @@ services:
     restart: always
     env_file: .env
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=${
-      - MONGO_INITDB_ROOT_PASSWORD=mongodb_order
+      - MONGO_INITDB_ROOT_USERNAME=${DB_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
       - MONGO_INITDB_DATABASE=order
 
     ports:
