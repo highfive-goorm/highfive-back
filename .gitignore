@@ -65,3 +65,6 @@ coverage.xml
 .env.local
 .env.dev
 .env.prod
+
+# Log
+host-logs/

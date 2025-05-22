@@ -14,3 +14,5 @@ class Alert(Base):
     is_global = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    class Config:
+        orm_mode=True
