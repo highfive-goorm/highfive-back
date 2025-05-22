@@ -1,9 +1,9 @@
 # admin/app/main.py
-from fastapi import HTTPException, FastAPI, Depends
+from fastapi import HTTPException, FastAPI, Depends, Body
 from sqlalchemy.orm import Session
 from .database import SessionLocal
 from .models import Admin
-from .schemas import AdminLogin
+from .schemas import AdminLogin, AdminRespLogin
 
 app = FastAPI()
 
@@ -16,9 +16,11 @@ def get_db():
         db.close()
 
 
-@app.post("/admin/login")
-def admin_login(login_data: AdminLogin, db: Session = Depends(get_db)):
-    admin = db.query(Admin).filter(Admin.account == login_data.account).first()
-    if not admin or admin.password != login_data.password:
+@app.post("/admin", response_model=AdminRespLogin, status_code=201)
+def admin_login(login_data: AdminLogin = Body(...), db: Session = Depends(get_db)):
+    admin = db.query(Admin).filter_by(
+        account=login_data.account, password=login_data.password).first()
+    if admin is None:
         raise HTTPException(status_code=401, detail="Invalid credentials")
-    return {"id": admin.id, "account": admin.account}
+    else:
+        return admin
