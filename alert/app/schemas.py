@@ -18,7 +18,7 @@ class AlertUpdate(BaseModel):
     is_global: Optional[bool]
 
 class AlertInDB(AlertBase):
-    id: int
+    id: str
     created_at: datetime
     updated_at: datetime
 
