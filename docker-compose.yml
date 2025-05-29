@@ -1,7 +1,4 @@
-
-
 services:
-
 
   gateway:
     env_file:
@@ -35,7 +32,6 @@ services:
     networks:
       - backend
 
-
   order:
     env_file:
       - ./.env
@@ -59,76 +55,9 @@ services:
       - "8001:8001"
     networks:
       - backend
-
     volumes:
       - ./host-logs/product:/app/logs
-  #  mongodb_product:
-#    env_file:
-#      - ./.env
-#    image: mongo:6.0
-#    container_name: mongodb_product
-#    restart: always
-#    environment:
-#      MONGO_INITDB_ROOT_USERNAME: ${ROOT_DB_USER_PRODUCT}
-#      MONGO_INITDB_ROOT_PASSWORD: ${ROOT_DB_PASSWORD_PRODUCT}
-#      MONGO_INITDB_DATABASE: product
-#    ports:
-#      - "27018:27017"
-#    volumes:
-#      - mongodb_product:/data/db
-#      - ./mongo-init/product:/docker-entrypoint-initdb.d
-#      - ./data:/data
-#    healthcheck:
-#      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-#      interval: 5s
-#      timeout: 2s
-#      retries: 5
-#    networks:
-#      - backend
 
-#  mongodb_brand:
-#    image: mongo:6.0
-#    env_file:
-#      - ./.env
-#    container_name: mongodb_brand
-#    restart: always
-#    environment:
-#      MONGO_INITDB_ROOT_USERNAME: ${ROOT_DB_USER_BRAND}
-#      MONGO_INITDB_ROOT_PASSWORD: ${ROOT_DB_PASSWORD_BRAND}
-#      MONGO_INITDB_DATABASE: brand
-#    ports:
-#      - "27020:27017"
-#    volumes:
-#      - mongodb_brand:/data/db
-#      - ./mongo-init/brand:/docker-entrypoint-initdb.d
-#      - ./data:/data
-#    healthcheck:
-#      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-#      interval: 5s
-#      timeout: 2s
-#      retries: 5
-#    networks:
-#      - backend
-
-#  mongodb_order:
-#    image: mongo:6.0
-#    container_name: mongodb_order
-#    restart: always
-#    env_file: ./.env
-#    environment:
-#      - MONGO_INITDB_ROOT_USERNAME=${DB_USER}
-#      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
-#      - MONGO_INITDB_DATABASE=order
-#
-#    ports:
-#      - "27019:27017"
-#    volumes:
-#      - mongodb_order:/data/db
-#      - ./mongo-init/order:/docker-entrypoint-initdb.d
-#      - ./data:/data
-#    networks:
-#      - backend
-#
   cart:
     build: ./cart
     container_name: cart
@@ -136,39 +65,8 @@ services:
       - ./.env                                       # ← load .env here
     environment:
       MONGODB_URI: "mongodb://${DB_USER}:${DB_PASSWORD}@${MONGO_URL}:${MONGO_PORT}/${MONGO_DB}?authSource=admin"
-
-    networks:
-      - backend
-#
-#  mongodb_cart:
-#    image: mongo:6.0
-#    container_name: mongodb_cart
-#    restart: always
-#    env_file: ./.env                                       # ← load .env here too
-#    environment:
-#      - MONGO_INITDB_ROOT_USERNAME=${DB_USER}
-#      - MONGO_INITDB_ROOT_PASSWORD=${DB_PASSWORD}
-#      - MONGO_INITDB_DATABASE=admin
-#    ports:
-#      - "27017:27017"
-#    networks:
-#      - backend
-#
-  # === promotion MongoDB 및 서비스 추가 ===
-  mongodb_promotion:
-    image: mongo:6.0
-    container_name: mongodb_promotion
-    restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${DB_USER}
-      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD}
-      MONGO_INITDB_DATABASE: promotion
     ports:
-      - "27021:27017"
-    volumes:
-      - mongodb_promotion:/data/db
-      - ./mongo-init/promotion:/docker-entrypoint-initdb.d
-      - ./data:/data
+      - "8002:8002"
     networks:
       - backend
 
@@ -196,18 +94,7 @@ services:
       - backend
     depends_on:
       - product
-    volumes:
-      - ./data/product.json:/data/product.json
-      - ./data/brand.json:/data/brand.json
 
-volumes:
-  mysql:
-  mongodb_product:
-  mongodb_order:
-  mongodb_brand:
-  mongodb_promotion:
-  mysql_alert:
-  mysql_user_data:
 networks:
   backend:
     driver: bridge
