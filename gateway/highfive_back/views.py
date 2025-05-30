@@ -1,4 +1,5 @@
 import json
+import os
 from typing import Dict
 
 import requests
@@ -10,7 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 @method_decorator(csrf_exempt, name="dispatch")
 class AdminView(View):
-    BASE_URL = 'http://admin:8003/admin'
+    BASE_URL = f'http://{os.getenv('ADMIN')}:{os.getenv('ADMIN_PORT')}/admin'
 
     def post(self, request):
         # 1) 요청 body를 JSON으로 파싱
@@ -45,7 +46,7 @@ class AdminView(View):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class LikeProxyView(View):
-    BASE_URL = 'http://product:8001/product'
+    BASE_URL = f'http://{os.getenv('PRODUCT')}:{os.getenv('PRODUCT_PORT')}/product'
 
     def post(self, request, id):
         url = f'{self.BASE_URL}/{id}/like'
@@ -117,7 +118,7 @@ class LikeProxyView(View):
 # CSRF exempt for internal microservice proxy
 @method_decorator(csrf_exempt, name="dispatch")
 class ProductProxyView(View):
-    BASE_URL = "http://product:8001/product"
+    BASE_URL = f'http://{os.getenv('PRODUCT')}:{os.getenv('PRODUCT_PORT')}/product'
 
     def get(self, request, id=None):
         # 1) URL 결정: 단일 조회 vs. 전체 리스트
@@ -182,8 +183,7 @@ class ProductProxyView(View):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class BrandLikeProxyView(View):
-    BASE_URL = 'http://product:8001/brand'
-
+    BASE_URL = f'http://{os.getenv('PRODUCT')}:{os.getenv('PRODUCT_PORT')}/brand'
     def post(self, request, id):
         """브랜드 좋아요"""
         url = f'{self.BASE_URL}/{id}/like'
@@ -241,7 +241,7 @@ class BrandLikeProxyView(View):
 
 @method_decorator(csrf_exempt, name="dispatch")
 class OrderProxyView(View):
-    BASE_URL = "http://order:8004/order"
+    BASE_URL = f"http:/{os.getenv('ORDER')}:{os.getenv('ORDER_PORT')}/order"
 
     def get(self, request, user_id=None):
         # 1) URL 결정
@@ -319,10 +319,90 @@ class OrderProxyView(View):
             return HttpResponse(status=204)
         return JsonResponse(resp.json(), safe=False, status=resp.status_code)
 
+@method_decorator(csrf_exempt, name="dispatch")
+class PromotionProxyView(View):
+    BASE_URL = f"http:/{os.getenv('PROMOTION')}:{os.getenv('PROMOTION_PORT')}/promotion"
+
+    def get(self, request, id):
+        # 1) URL 결정
+        url = f"{self.BASE_URL}/{id}"
+        resp = requests.get(url, params=request.GET)
+
+        # 2) HTTP 오류 체크
+        try:
+            resp.raise_for_status()
+        except requests.exceptions.HTTPError as e:
+            # 하위 서비스가 4xx/5xx를 보내면 그대로 전달
+            return JsonResponse(
+                {"error": str(e)}, status=resp.status_code
+            )
+
+        # 3) 빈 바디(204 등) 처리
+        if not resp.text:
+            return JsonResponse({}, status=resp.status_code)
+
+        # 4) Content-Type 검사
+        content_type = resp.headers.get("Content-Type", "")
+        if "application/json" not in content_type:
+            # JSON 아닌 경우
+            return JsonResponse(
+                {"error": f"Invalid Content-Type: {content_type}"},
+                status=502
+            )
+
+        # 5) JSON 파싱
+        try:
+            data = resp.json()
+        except ValueError:
+            # 파싱 실패 시 빈 JSON 객체로 대응
+            return JsonResponse({}, status=502)
+
+        # 6) 리스트인지 판단해서 safe 파라미터 결정
+        return JsonResponse(data, safe=False, status=resp.status_code)
+
+    def post(self, request, *args, **kwargs):
+        # is_from_cart 경로 파라미터가 들어올 수도 있음
+        url = f"{self.BASE_URL}"
+        try:
+            payload = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON"}, status=400)
+        resp = requests.post(url, json=payload)
+        try:
+            data = resp.json()
+            safe = not isinstance(data, list)
+            return JsonResponse(data, safe=safe, status=resp.status_code)
+        except ValueError:
+            return HttpResponse(
+                resp.content,
+                status=resp.status_code,
+                content_type=resp.headers.get("Content-Type", "application/octet-stream")
+            )
+
+    def put(self, request, id=None, *args, **kwargs):
+        if not id:
+            return JsonResponse({"error": "Order id required"}, status=400)
+        url = f"{self.BASE_URL}/{id}"
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON"}, status=400)
+        resp = requests.put(url, json=data)
+        return JsonResponse(resp.json(), safe=False, status=resp.status_code)
+
+    def delete(self, request, id=None, *args, **kwargs):
+        if not id:
+            return JsonResponse({"error": "Order id required"}, status=400)
+        url = f"{self.BASE_URL}/{id}"
+        resp = requests.delete(url)
+        if resp.status_code == 204:
+            return HttpResponse(status=204)
+        return JsonResponse(resp.json(), safe=False, status=resp.status_code)
+
 
 @method_decorator(csrf_exempt, name="dispatch")
 class CartProxyView(View):
-    BASE_URL = "http://cart:8002/cart"
+    BASE_URL = f"http://{os.getenv('CART')}:{os.getenv('CART_PORT')}/cart"
 
     def post(self, request, user_id):
         # 1) load the raw JSON from the incoming Django request
@@ -413,7 +493,7 @@ class CartProxyView(View):
 
 @method_decorator(csrf_exempt, name="dispatch")
 class RecommendProxyView(View):
-    BASE_URL = "http://recommend:8007/recommend"
+    BASE_URL = f"http://{os.getenv('RECOMMEND')}:{os.getenv('RECOMMEND_PORT')}/recommend"
 
     def get(self, request, user_id):
         # 1) 내부 recommend 서비스 호출 (/recommend/{user_id}?top_n=n)

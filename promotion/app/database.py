@@ -1,5 +1,17 @@
+
+import os
+
+from dotenv import load_dotenv, find_dotenv
 from motor.motor_asyncio import AsyncIOMotorClient
 
-client = AsyncIOMotorClient("mongodb://root:mongodb_promotion@mongodb_promotion:27017")
-db = client["promotion"]
-promotion_collection = db["promotion"]
+load_dotenv(find_dotenv(usecwd=True))
+MONGO_URI = (
+    f"mongodb://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@{os.getenv('MONGO_URL')}:{os.getenv('MONGO_PORT')}/{os.getenv('MONGO_DB')}?authSource=admin"
+)
+
+client = AsyncIOMotorClient(MONGO_URI)
+
+db = client["product"]
+
+collection = db["promotion"]
+

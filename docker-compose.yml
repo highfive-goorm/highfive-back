@@ -155,22 +155,22 @@ services:
 #      - backend
 #
   # === promotion MongoDB 및 서비스 추가 ===
-  mongodb_promotion:
-    image: mongo:6.0
-    container_name: mongodb_promotion
-    restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${DB_USER}
-      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD}
-      MONGO_INITDB_DATABASE: promotion
-    ports:
-      - "27021:27017"
-    volumes:
-      - mongodb_promotion:/data/db
-      - ./mongo-init/promotion:/docker-entrypoint-initdb.d
-      - ./data:/data
-    networks:
-      - backend
+#  mongodb_promotion:
+#    image: mongo:6.0
+#    container_name: mongodb_promotion
+#    restart: always
+#    environment:
+#      MONGO_INITDB_ROOT_USERNAME: ${DB_USER}
+#      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD}
+#      MONGO_INITDB_DATABASE: promotion
+#    ports:
+#      - "27021:27017"
+#    volumes:
+#      - mongodb_promotion:/data/db
+#      - ./mongo-init/promotion:/docker-entrypoint-initdb.d
+#      - ./data:/data
+#    networks:
+#      - backend
 
   promotion:
     env_file:
@@ -181,8 +181,7 @@ services:
       - "8006:8006"
     networks:
       - backend
-    depends_on:
-      - mongodb_promotion
+
 
   recommend:
     env_file:

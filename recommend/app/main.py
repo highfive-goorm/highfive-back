@@ -1,3 +1,5 @@
+import os
+
 from fastapi import FastAPI, HTTPException, Path
 from typing import List
 import httpx
@@ -38,7 +40,7 @@ async def get_recommendations(
     try:
         async with httpx.AsyncClient() as client:
             resp = await client.post(
-                "http://product:8001/product/bulk",
+                f"http://{os.getenv('PRODUCT')}:{os.getenv('PRODUCT_PORT')}/product/bulk",
                 json={"product_ids": product_ids},
                 timeout=10.0,
             )

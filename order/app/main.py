@@ -1,4 +1,5 @@
 # order/app/main.py
+import os
 from typing import List, Optional
 
 import httpx
@@ -59,7 +60,7 @@ async def get_orders(
     try:
         async with httpx.AsyncClient() as client:
             resp = await client.post(
-                "http://product:8001/product/bulk",
+                f"http://{os.getenv('PRODUCT')}:{os.getenv('PRODUCT_PORT')}/product/bulk",
                 json={"product_ids": list(product_ids)},
                 timeout=10.0
             )
