@@ -79,8 +79,6 @@ services:
       - "8006:8006"
     networks:
       - backend
-    depends_on:
-      - mongodb_promotion
 
   recommend:
     env_file:
