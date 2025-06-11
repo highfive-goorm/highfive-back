@@ -15,6 +15,9 @@ def get_db():
     finally:
         db.close()
 
+@app.get("/health", status_code=200)
+async def health_check():
+    return {"status": "ok"}
 
 @app.post("/admin", response_model=AdminRespLogin, status_code=201)
 def admin_login(login_data: AdminLogin = Body(...), db: Session = Depends(get_db)):

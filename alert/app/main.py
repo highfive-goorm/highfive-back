@@ -20,6 +20,9 @@ def get_db():
     finally:
         db.close()
 
+@app.get("/health", status_code=200)
+async def health_check():
+    return {"status": "ok"}
 
 @app.get("/alert", response_model=dict)
 def list_alerts(
